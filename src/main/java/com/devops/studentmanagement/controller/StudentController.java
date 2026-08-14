@@ -8,6 +8,6 @@ public class StudentController {
 
     @GetMapping("/students")
     public String getStudents() {
-        return "Student Management System is running!";
+        return "Student Management System - CI/CD is working!";
     }
 }
