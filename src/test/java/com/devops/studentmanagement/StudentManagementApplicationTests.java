@@ -21,6 +21,6 @@ class StudentManagementApplicationTests {
     void studentsApiShouldReturnSuccess() throws Exception {
         mockMvc.perform(get("/students"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Student Management System - CI/CD is working!"));
+                .andExpect(content().string("Student Management System - CI/CD Pipeline Updated Successfully!"));
     }
 }
