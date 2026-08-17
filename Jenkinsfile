@@ -22,5 +22,14 @@ pipeline {
                     fingerprint: true
             }
         }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    sudo cp target/*.jar /opt/student-management/student-management.jar
+                    sudo systemctl restart student-management
+                '''
+            }
+        }
     }
 }
