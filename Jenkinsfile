@@ -26,7 +26,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                    docker build -t student-management:latest .
+                    docker build -t student-management:${BUILD_NUMBER} .
+                    docker tag student-management:${BUILD_NUMBER} student-management:latest
                 '''
             }
         }
@@ -40,7 +41,7 @@ pipeline {
                     docker run -d \
                         --name student-management-container \
                         -p 8083:8082 \
-                        student-management:latest
+                        student-management:${BUILD_NUMBER}
                 '''
             }
         }
