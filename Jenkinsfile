@@ -23,11 +23,24 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Docker Build') {
             steps {
                 sh '''
-                    sudo cp target/*.jar /opt/student-management/student-management.jar
-                    sudo systemctl restart student-management
+                    docker build -t student-management:latest .
+                '''
+            }
+        }
+
+        stage('Docker Deploy') {
+            steps {
+                sh '''
+                    docker stop student-management-container || true
+                    docker rm student-management-container || true
+
+                    docker run -d \
+                        --name student-management-container \
+                        -p 8083:8082 \
+                        student-management:latest
                 '''
             }
         }
