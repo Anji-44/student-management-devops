@@ -53,5 +53,14 @@ pipeline {
                 '''
             }
         }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                    sleep 5
+                    curl -f http://localhost:8083/students
+                '''
+           }
+        } 
     }
 }
