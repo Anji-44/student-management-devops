@@ -21,6 +21,6 @@ class StudentManagementApplicationTests {
     void studentsApiShouldReturnSuccess() throws Exception {
         mockMvc.perform(get("/students"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Student Management System - Automatic Deployment Version 18 Successfully!"));
+                .andExpect(content().string("Student Management System - Automatic Deployment Version 20 Successfully!"));
     }
 }
