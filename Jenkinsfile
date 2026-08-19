@@ -43,11 +43,16 @@ pipeline {
         }
 
         stage('Docker Build') {
+            when {
+                expression {
+                    params.DEPLOY_MODE == 'NORMAL'
+                }
+            }
             steps {
                 sh '''
-                    docker build -t student-management:${BUILD_NUMBER} .
-                    docker tag student-management:${BUILD_NUMBER} student-management:latest
-                '''
+                     docker build -t student-management:${BUILD_NUMBER} .
+                     docker tag student-management:${BUILD_NUMBER} student-management:latest
+                  '''
             }
         }
 
