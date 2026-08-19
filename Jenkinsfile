@@ -49,6 +49,7 @@ pipeline {
                         --restart unless-stopped \
                         -p 8083:8082 \
                         student-management:${BUILD_NUMBER}
+                    docker image prune -f
                 '''
             }
         }
