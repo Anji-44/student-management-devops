@@ -54,16 +54,30 @@ pipeline {
         stage('Docker Deploy') {
             steps {
                 sh '''
-                    docker stop student-management-container || true
-                    docker rm student-management-container || true
+            if [ "$DEPLOY_MODE" = "ROLLBACK" ]; then
+                if [ -z "$ROLLBACK_VERSION" ]; then
+                    echo "ERROR: ROLLBACK_VERSION is required for rollback."
+                    exit 1
+                fi
 
-                    docker run -d \
-                        --name student-management-container \
-                        --restart unless-stopped \
-                        -p 8083:8082 \
-                        student-management:${BUILD_NUMBER}
-                    echo "${BUILD_NUMBER}" > deployed-version.txt
-                '''
+                IMAGE="student-management:${ROLLBACK_VERSION}"
+                echo "Rolling back to ${IMAGE}"
+            else
+                IMAGE="student-management:${BUILD_NUMBER}"
+                echo "Deploying new version ${IMAGE}"
+            fi
+
+            docker stop student-management-container || true
+            docker rm student-management-container || true
+
+            docker run -d \
+                --name student-management-container \
+                --restart unless-stopped \
+                -p 8083:8082 \
+                "$IMAGE"
+
+            echo "$IMAGE" > deployed-version.txt
+        '''
             }
         }
 
