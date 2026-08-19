@@ -1,6 +1,19 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'DEPLOY_MODE',
+            choices: ['NORMAL', 'ROLLBACK'],
+            description: 'Choose NORMAL for a new deployment or ROLLBACK for a previous Docker image.'
+        )
+        string(
+            name: 'ROLLBACK_VERSION',
+            defaultValue: '',
+            description: 'Docker image version to deploy during rollback, e.g. 20'
+        )
+    }
+
     stages {
 
         stage('Checkout') {
