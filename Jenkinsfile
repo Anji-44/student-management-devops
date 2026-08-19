@@ -16,6 +16,12 @@ pipeline {
             }
         }
 
+        stage('Package') {
+            steps {
+                sh './mvnw package -DskipTests'
+            }
+        }
+
         stage('Archive JAR') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar',
