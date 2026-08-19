@@ -63,6 +63,15 @@ pipeline {
                     echo ""
                     echo "Deployment verification successful!"
                 '''
+            }
+       }
+
+        stage('Docker Cleanup') {
+            steps {
+                sh '''
+                    docker image prune -f
+                    echo "Docker cleanup completed!"
+                '''
            }
         } 
     }
