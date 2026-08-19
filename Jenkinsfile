@@ -58,7 +58,10 @@ pipeline {
             steps {
                 sh '''
                     sleep 5
+                    echo "Checking deployed application..."
                     curl -f http://localhost:8083/students
+                    echo ""
+                    echo "Deployment verification successful!"
                 '''
            }
         } 
