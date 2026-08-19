@@ -46,6 +46,7 @@ pipeline {
 
                     docker run -d \
                         --name student-management-container \
+                        --restart unless-stopped \
                         -p 8083:8082 \
                         student-management:${BUILD_NUMBER}
                 '''
