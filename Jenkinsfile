@@ -87,14 +87,17 @@ pipeline {
         }
 
         stage('Verify Deployment') {
-            steps {
-                sh '''
-                    sleep 5
-                    echo "Checking deployed application..."
-                    curl -f http://localhost:8083/students
-                    echo ""
-                    echo "Deployment verification successful!"
-                '''
+    steps {
+        sh '''
+            echo "Verifying application deployment..."
+            RESPONSE=$(curl -s http://localhost:8083/students)
+
+            echo "Application response:"
+            echo "$RESPONSE"
+
+            echo "$RESPONSE" | grep -q "Student Management System"
+            echo "Deployment verification successful!"
+        '''
             }
        }
 
