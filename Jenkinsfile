@@ -136,10 +136,24 @@ pipeline {
         stage('Docker Cleanup') {
     steps {
         sh '''
-            docker images student-management --format "{{.Repository}}:{{.Tag}}" | \
-            grep -E 'student-management:[0-9]+$' | \
-            grep -v "student-management:${BUILD_NUMBER}" | \
-            xargs -r docker rmi -f
+            echo "Docker Cleanup started..."
+
+            IMAGES=$(docker images student-management \
+                --format "{{.Tag}}" | \
+                grep -E '^[0-9]+$' | \
+                sort -nr)
+
+            KEEP=$(echo "$IMAGES" | head -n 3)
+
+            for IMAGE in $IMAGES; do
+                if ! echo "$KEEP" | grep -qx "$IMAGE"; then
+                    echo "Removing old image: student-management:$IMAGE"
+                    docker rmi -f "student-management:$IMAGE" || true
+                fi
+            done
+
+            echo "Keeping versions:"
+            echo "$KEEP"
 
             echo "Docker Cleanup completed!"
         '''
