@@ -92,7 +92,8 @@ pipeline {
         sh '''
             echo "Waiting for application to start..."
 
-            for i in {1..10}; do
+            i=1
+            while [ "$i" -le 10 ]; do
                 if curl -f http://localhost:8083/students; then
                     echo ""
                     echo "Application is responding!"
@@ -101,17 +102,19 @@ pipeline {
 
                 echo "Application not ready yet... retrying in 3 seconds"
                 sleep 3
-
-                if [ "$i" -eq 10 ]; then
-                    echo "ERROR: Application did not start."
-                    exit 1
-                fi
+                i=$((i + 1))
             done
+
+            if [ "$i" -gt 10 ]; then
+                echo "ERROR: Application did not start."
+                exit 1
+            fi
 
             echo "Checking Docker container health..."
 
-            for i in ${seq 1 10}; do
-                STATUS=$(docker inspect --format='{{.State.Health.Status}}' student-management-container 2>/dev/null || true)
+            i=1
+            while [ "$i" -le 10 ]; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' student-management-container)
 
                 echo "Health status: $STATUS"
 
@@ -121,6 +124,7 @@ pipeline {
                 fi
 
                 sleep 3
+                i=$((i + 1))
             done
 
             echo "ERROR: Docker container did not become healthy."
