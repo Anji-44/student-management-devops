@@ -1,3 +1,4 @@
+// pipeline verification update
 pipeline {
     agent any
 
@@ -115,6 +116,7 @@ pipeline {
 
             echo "Docker Cleanup completed!"
         '''
+
            }
         } 
     }
