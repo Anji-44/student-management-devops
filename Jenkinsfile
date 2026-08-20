@@ -90,11 +90,26 @@ pipeline {
         stage('Verify Deployment') {
     steps {
         sh '''
-            echo "Checking application response..."
-            curl -f http://localhost:8083/students
+            echo "Waiting for application to start..."
 
-            echo ""
+            for i in {1..10}; do
+                if curl -f http://localhost:8083/students; then
+                    echo ""
+                    echo "Application is responding!"
+                    break
+                fi
+
+                echo "Application not ready yet... retrying in 3 seconds"
+                sleep 3
+
+                if [ "$i" -eq 10 ]; then
+                    echo "ERROR: Application did not start."
+                    exit 1
+                fi
+            done
+
             echo "Checking Docker container health..."
+
             for i in {1..10}; do
                 STATUS=$(docker inspect --format='{{.State.Health.Status}}' student-management-container 2>/dev/null || true)
 
@@ -105,7 +120,7 @@ pipeline {
                     exit 0
                 fi
 
-                sleep 5
+                sleep 3
             done
 
             echo "ERROR: Docker container did not become healthy."
