@@ -98,7 +98,7 @@ pipeline {
             echo "Application response:"
             echo "$RESPONSE"
 
-            echo "$RESPONSE" | grep -q "Automatic Deployment Successfully"
+            echo "$RESPONSE" | grep -q "Student Management System"
 
             echo "Deployment verification successful!"
         '''
