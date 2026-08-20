@@ -106,11 +106,15 @@ pipeline {
        }
 
         stage('Docker Cleanup') {
-            steps {
-                sh '''
-                    docker image prune -f
-                    echo "Docker cleanup completed!"
-                '''
+    steps {
+        sh '''
+            docker images student-management --format "{{.Repository}}:{{.Tag}}" | \
+            grep -E 'student-management:[0-9]+$' | \
+            grep -v "student-management:${BUILD_NUMBER}" | \
+            xargs -r docker rmi -f
+
+            echo "Docker Cleanup completed!"
+        '''
            }
         } 
     }
