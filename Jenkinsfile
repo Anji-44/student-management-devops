@@ -110,7 +110,7 @@ pipeline {
 
             echo "Checking Docker container health..."
 
-            for i in {1..10}; do
+            for i in ${seq 1 10}; do
                 STATUS=$(docker inspect --format='{{.State.Health.Status}}' student-management-container 2>/dev/null || true)
 
                 echo "Health status: $STATUS"
