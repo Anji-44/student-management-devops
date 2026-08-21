@@ -121,14 +121,83 @@ pipeline {
         }
 
         stage('Verify Deployment') {
-            steps {
-                sh '''
-                    sleep 5
-                    echo "Checking deployed application..."
-                    curl -f http://localhost:8083/students
+    steps {
+        sh '''
+            echo "Waiting for application to start..."
+
+            i=1
+            while [ $i -le 10 ]; do
+                if curl -f http://localhost:8083/students; then
                     echo ""
-                    echo "Deployment verification successful!"
-                '''
+                    echo "Application is responding!"
+                    break
+                fi
+
+                echo "Application not ready yet... retrying in 3 seconds"
+                sleep 3
+                i=$((i + 1))
+            done
+
+            if [ $i -gt 10 ]; then
+                echo "ERROR: Application failed to start."
+                exit 1
+            fi
+
+            echo "Checking Docker container health..."
+
+            i=1
+            while [ $i -le 10 ]; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' student-management-container 2>/dev/null || echo "unknown")
+
+                echo "Health status: $STATUS"
+
+                if [ "$STATUS" = "healthy" ]; then
+                    echo "Docker container is healthy!"
+                    break
+                fi
+
+                echo "Container not healthy yet... retrying in 3 seconds"
+                sleep 3
+                i=$((i + 1))
+            done
+
+            if [ $i -gt 10 ]; then
+                echo "ERROR: Docker container did not become healthy."
+                exit 1
+            fi
+
+            if [ "$DEPLOY_MODE" = "ROLLBACK" ]; then
+                EXPECTED_IMAGE="student-management:${ROLLBACK_VERSION}"
+                ACTUAL_IMAGE=$(docker inspect --format='{{.Config.Image}}' student-management-container)
+
+                echo "Expected rollback image: $EXPECTED_IMAGE"
+                echo "Actual running image: $ACTUAL_IMAGE"
+
+                if [ "$ACTUAL_IMAGE" != "$EXPECTED_IMAGE" ]; then
+                    echo "ERROR: Rollback verification failed!"
+                    exit 1
+                fi
+
+                echo "Rollback verification successful!"
+                echo "Running version: ${ROLLBACK_VERSION}"
+            else
+                EXPECTED_IMAGE="student-management:${BUILD_NUMBER}"
+                ACTUAL_IMAGE=$(docker inspect --format='{{.Config.Image}}' student-management-container)
+
+                echo "Expected deployment image: $EXPECTED_IMAGE"
+                echo "Actual running image: $ACTUAL_IMAGE"
+
+                if [ "$ACTUAL_IMAGE" != "$EXPECTED_IMAGE" ]; then
+                    echo "ERROR: Deployment verification failed!"
+                    exit 1
+                fi
+
+                echo "Deployment verification successful!"
+                echo "Running version: ${BUILD_NUMBER}"
+            fi
+
+            exit 0
+        '''
             }
        }
 
